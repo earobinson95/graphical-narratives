@@ -1,0 +1,684 @@
+---
+title: "penguins closeread prototype"
+format: 
+  closeread-html:
+    css: styles.css
+    cr-style:
+      narrative-background-color-overlay: "#DCDCD8"
+      narrative-background-color-sidebar: "#F3F4F6"
+bibliography: references.bib
+embed-resources: true
+messages: false
+warning: false
+---
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+Between 2007 and 2009, researchers collected data on over 340 brush-tailed penguins, or penguins of the genus *Pygoscelis*. Dr. Kristen Gorman led the study as part of the Palmer Long Term Ecological Research (Palmer LTER) program, a program funded by the US National Science Foundation (NSF) to research the Antarctic pelagic marine ecosystem. The researchers collected measurements of three species of *Pygoscelis* penguins—Adélie, Chinstrap, and Gentoo penguins—nesting on three islands in the Palmer Archipelago in Antarctica [@gorman2014; @palmerpenguins].
+
+![](lter_penguins.png)
+
+:::::::: cr-section
+
+The penguins were observed on Biscoe Island, Dream Island, and Torgersen Island. @cr-islands
+
+::: {#cr-islands}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(island)) +
+  geom_bar(fill = "#A6CEE3") +
+  labs(x = "Island",
+       y = "count") +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_discrete(expand = expansion(add = 0.8)) +
+  scale_y_continuous(expand = expansion(add = 20))
+
+
+```
+:::
+
+Gentoo penguins were observed only on Biscoe Island. @cr-islands-gentoo
+
+::: {#cr-islands-gentoo}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(island)) +
+    geom_bar(fill = "#A6CEE3") +
+  geom_bar(data = \(d) dplyr::filter(d, species == "Gentoo"),
+           fill = "#2078b3") +
+  labs(x = "Island",
+       y = "count") +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_discrete(expand = expansion(add = 0.8)) +
+  scale_y_continuous(expand = expansion(add = 20)) +
+  annotate("text",
+           x = 2.85,
+           y = 165,
+           label = "Gentoo",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+Chinstrap penguins were observed only on Dream Island. @cr-islands-chinstrap
+
+::: {#cr-islands-chinstrap}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(island)) +
+    geom_bar(fill = "#A6CEE3") +
+  geom_bar(data = \(d) dplyr::filter(d, species == "Chinstrap"),
+           fill = "#2078b3") +
+  labs(x = "Island",
+       y = "count") +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_discrete(expand = expansion(add = 0.8)) +
+  scale_y_continuous(expand = expansion(add = 20)) +
+  annotate("text",
+           x = 2.65,
+           y = 165,
+           label = "Chinstrap",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+Adélie penguins were the only species observed on all three islands, and the only species observed on Torgersen Island. @cr-islands-adelie
+
+::: {#cr-islands-adelie}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(island)) +
+    geom_bar(fill = "#A6CEE3") +
+  geom_bar(data = \(d) dplyr::filter(d, species == "Adelie"),
+           fill = "#2078b3") +
+  labs(x = "Island",
+       y = "count") +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_discrete(expand = expansion(add = 0.8)) +
+  scale_y_continuous(expand = expansion(add = 20)) +
+  annotate("text",
+           x = 3,
+           y = 165,
+           label = "Adélie",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+The data include a bit more Adélie than Gentoo penguins, and fewer Chinstrap penguins. Within each species, there is a balance of male and female penguins. @cr-species-sex
+
+::: {#cr-species-sex}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+
+
+penguins |>
+  drop_na(species, sex) |>
+  count(species, sex, name = "n") |>
+  ggplot(aes(x = species, y = sex)) +
+  geom_point(aes(size = n),
+             shape = 22,
+             fill = "#A6CEE3",
+             colour = "#A6CEE3") +
+  scale_size_area(max_size = 15) +
+  labs(x = "Species",
+       y = "Sex") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_discrete(expand = expansion(add = 0.75)) +
+  scale_y_discrete(expand = expansion(add = 0.75))
+
+
+```
+:::
+::::::::
+
+### Let's explore how the species physically differ from one another.
+
+::::::::::: cr-section
+First, let's look at the penguins' body measurements. @cr-body-flipper
+
+::: {#cr-body-flipper}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(fill = "#A6CEE3",
+             colour = "#A6CEE3",
+             size = 2) +
+  labs(x = "Flipper Length (mm)",
+       y = "Body Mass (g)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(180, 200, 220),
+                     limits = c(165, 240),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(3000, 4000, 5000, 6000),
+                     limits = c(2250, 6750),
+                     expand = expansion(add = 0.75))
+
+
+```
+:::
+
+Gentoo penguins are the largest, with greater body mass and longer flippers than the other two species. @cr-body-flipper-gentoo
+
+::: {#cr-body-flipper-gentoo}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Gentoo"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Gentoo"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Flipper Length (mm)",
+       y = "Body Mass (g)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(180, 200, 220),
+                     limits = c(165, 240),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(3000, 4000, 5000, 6000),
+                     limits = c(2250, 6750),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 190,
+           y = 6000,
+           label = "Gentoo",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+
+```
+:::
+
+Adélie penguins are smaller than Gentoo penguins, with lower body mass and shorter flippers @cr-body-flipper-adelie.
+
+::: {#cr-body-flipper-adelie}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Adelie"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Adelie"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Flipper Length (mm)",
+       y = "Body Mass (g)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(180, 200, 220),
+                     limits = c(165, 240),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(3000, 4000, 5000, 6000),
+                     limits = c(2250, 6750),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 170,
+           y = 5100,
+           label = "Adélie",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+
+```
+:::
+
+Chinstrap penguins are similar in size to Adélie penguins, also smaller than Gentoo penguins. @cr-body-flipper-chinstrap
+
+::: {#cr-body-flipper-chinstrap}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Chinstrap"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Chinstrap"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Flipper Length (mm)",
+       y = "Body Mass (g)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(180, 200, 220),
+                     limits = c(165, 240),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(3000, 4000, 5000, 6000),
+                     limits = c(2250, 6750),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 205,
+           y = 3000,
+           label = "Chinstrap",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+
+```
+:::
+
+So body size distinguishes Gentoo penguins from the rest, but we can't tell apart Adélie and Chinstrap penguins based on body mass and flipper length alone. @cr-body-flipper
+
+Now let's look at the penguins' bill measurements. @cr-bill
+
+::: {#cr-bill}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(fill = "#A6CEE3",
+             colour = "#A6CEE3",
+             size = 2) +
+  labs(x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(30, 40, 50, 60),
+                     limits = c(29, 62.5),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(14, 16, 18, 20, 22),
+                     limits = c(13, 22),
+                     expand = expansion(add = 0.75))
+
+
+```
+:::
+
+Chinstrap penguins tend to have the largest bills, with long and deep bills. @cr-bill-chinstrap
+
+::: {#cr-bill-chinstrap}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Chinstrap"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Chinstrap"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(30, 40, 50, 60),
+                     limits = c(29, 62.5),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(14, 16, 18, 20, 22),
+                     limits = c(13, 22),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 48,
+           y = 21.75,
+           label = "Chinstrap",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+Adélie penguins tend to have deep bills, similar to Chinstrap penguins, but Adélie bills are shorter. @cr-bill-adelie
+
+::: {#cr-bill-adelie}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Adelie"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Adelie"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(30, 40, 50, 60),
+                     limits = c(29, 62.5),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(14, 16, 18, 20, 22),
+                     limits = c(13, 22),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 30,
+           y = 14,
+           label = "Adélie",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+Gentoo penguins tend to have long bills, similar to Chinstrap penguins, but Gentoo bills are shallower. @cr-bill-gentoo
+
+::: {#cr-bill-gentoo}
+```{r}
+#| fig-width: 4
+#| fig-height: 2.5
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+geom_point(data = \(d) dplyr::filter(d, species != "Gentoo"),
+           colour = "#A6CEE3",
+           size = 2) +
+geom_point(data = \(d) dplyr::filter(d, species == "Gentoo"),
+           colour = "#2078b3",
+           size = 2) +
+  labs(x = "Bill Length (mm)",
+       y = "Bill Depth (mm)") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"),
+        axis.text.x = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.text.y = element_text(family = "Times New Roman",
+                                   size = 12),
+        axis.title.x = element_text(size = 15,
+                                    margin = margin(t = 8)),
+        axis.title.y = element_text(size = 15,
+                                    margin = margin(r = 8)),
+        plot.background = element_rect(fill = "#F3F4F6", color = NA),
+        panel.background = element_rect(fill = "#FFFFFF", color = NA),
+        panel.border = element_rect(color = "#E5E7EB",
+                                    linewidth = 1),
+        plot.margin = margin(t = 15,
+                             r = 15,
+                             b = 15,
+                             l = 15)) +
+  scale_x_continuous(breaks = c(30, 40, 50, 60),
+                     limits = c(29, 62.5),
+                     expand = expansion(add = 0.75)) +
+  scale_y_continuous(breaks = c(14, 16, 18, 20, 22),
+                     limits = c(13, 22),
+                     expand = expansion(add = 0.75)) +
+  annotate("text",
+           x = 54,
+           y = 14,
+           label = "Gentoo",
+           hjust = 0,
+           size = 4,
+           color = "#2078b3",
+           fontface = "bold")
+
+```
+:::
+
+So, bill length and depth separate all three species: Chinstraps have long, deep bills, Adélies have short, deep bills, and Gentoo have long, shallow bills. Body size distinguishes Gentoos, and bill shape can distinguish the rest. @cr-bill
+
+:::::::::::
+

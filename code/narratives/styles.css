@@ -1,0 +1,13 @@
+/* Disable opacity transitions on Closeread stickies */
+.cr-section .sticky {
+  transition: none !important;
+}
+
+.spaced-heading {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+
+a {
+  color: #2078b3;
+}

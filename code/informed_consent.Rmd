@@ -1,0 +1,30 @@
+---
+title: "Informed Consent"
+output: html_document
+
+
+#### Introduction
+
+
+#### What is the reason for doing this research study?
+
+
+#### What will be done during this research study?
+
+
+#### What are the possible risks of being in this research study?
+
+
+#### What are the possible benefits to you?
+
+
+#### Will you be compensated for being in this research study?"
+
+
+#### How will information about you be protected?
+
+
+#### What are your rights as a research participant?
+
+
+#### What will happen if you decide not to be in this research study, or decide to stop participating once you start?
