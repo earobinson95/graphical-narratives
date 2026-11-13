@@ -11,6 +11,10 @@ dbListTables(db_con)
 
 # Users ------------------------------------------------------------------------
 users <- dbReadTable(db_con,"users")
+scroll_events <- dbReadTable(db_con,"scroll_events")
+covariates <- dbReadTable(db_con,"covariates")
+
+
 
 # setup original data
 users <- tibble("prolific_id"       = NA,

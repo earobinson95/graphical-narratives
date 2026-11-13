@@ -8,13 +8,6 @@ filename      <- here::here("study_data.db")
 sqlite.driver <- dbDriver("SQLite")
 db_con        <- dbConnect(sqlite.driver, dbname = filename)
 
-dbListTables(db_con)
-
-users <- tibble("prolific_id"       = NA)
-
-dbWriteTable(db_con, "users", users)
-
-
 function(input, output, session) {
   shinyjs::disable(selector = ".navbar-nav a")
   
@@ -36,6 +29,27 @@ function(input, output, session) {
   })
   
   observeEvent(input$submit_cov, {
+    items <- c(paste0("nfc_", 1:6), paste0("gtd_", 1:4))
+    
+    answered <- vapply(items, function(i) !is.null(input[[i]]), logical(1))
+    if (!all(answered)) {
+      showNotification(
+        paste0("Please answer all questions (", sum(!answered), " remaining)."),
+        type = "warning"
+      )
+      return()
+    }
+    
+    answers <- setNames(lapply(items, function(i) as.integer(input[[i]])), items)
+    
+    covariates <- data.frame(
+      session_id = session$token,
+      answers,
+      stringsAsFactors = FALSE
+    )
+    
+    dbWriteTable(db_con, "covariates", covariates, append = TRUE, row.names = FALSE)
+    
     updateTabsetPanel(session, "inNavBar", selected = "study-tab")
   })
   
