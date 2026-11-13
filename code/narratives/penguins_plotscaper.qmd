@@ -1,12 +1,14 @@
 ---
 title: "penguins plotscaper prototype"
-format: html
-editor: visual
-bibliography: references.bib
-embed-resources: true
-messages: false
-warning: false
-echo: false
+format: 
+  html:
+    include-after-body: tracker_plotscaper.html
+    editor: visual
+    bibliography: references.bib
+    embed-resources: true
+    messages: false
+    warning: false
+    echo: false
 ---
 
 ```{r}
@@ -28,14 +30,13 @@ penguins_clean <- penguins |>
          "Sex" = "sex")
 ```
 
-
 Between 2007 and 2009, researchers collected data on over 340 brush-tailed penguins, or penguins of the genus *Pygoscelis*. Dr. Kristen Gorman led the study as part of the Palmer Long Term Ecological Research (Palmer LTER) program, a program funded by the US National Science Foundation (NSF) to research the Antarctic pelagic marine ecosystem. The researchers collected measurements of three species of *Pygoscelis* penguins—Adélie, Chinstrap, and Gentoo penguins—nesting on three islands in the Palmer Archipelago in Antarctica [@gorman2014; @palmerpenguins].
 
 ![](lter_penguins.png)
 
-### Explore the data! 
+### Explore the data!
 
-Click on a bar, a square, or drag a box around points to select penguins in one plot and highlight the same penguins in the others. Click on "key bindings" in the top right corner to see keyboard shortcuts for more ways to interact with the plots. 
+Click on a bar, a square, or drag a box around points to select penguins in one plot and highlight the same penguins in the others. Click on "key bindings" in the top right corner to see keyboard shortcuts for more ways to interact with the plots.
 
 ```{r}
 create_schema(penguins_clean) |>
@@ -46,14 +47,3 @@ create_schema(penguins_clean) |>
   render()
 ```
 
-```{r}
-# POTENTIAL TAKEAWAYS
-
-# - Gentoo penguins only live on Biscoe island. Chinstrap penguins only live on Dream island. Adelie penguins live on all three, and are the only species to live on Torgersen island.
-# 
-# - Gentoo penguins are the biggest, with greater body mass and longer flipper length. Adelie and Chinstrap penguins have similar body mass and flipper length. Flipper length is positively associated with body mass.
-# 
-# - Chinstrap penguins have the biggest bills. Adelie penguins have shorter bills. Gentoo penguins have shallower bills. Bill depth and bill length are positively associated **within** species.
-# 
-# - Male penguins are larger than female penguins of the same species in terms of all measurements.
-```

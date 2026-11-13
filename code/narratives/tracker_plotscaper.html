@@ -1,0 +1,58 @@
+<script>
+(function () {
+  const events = [];
+  let sent = 0, seq = 0, hiddenMs = 0, hiddenSince = null, downInCell = false;
+  const t0 = performance.now(), startedAt = Date.now();
+  const now = () => Math.round(performance.now() - t0);
+  const rec = (type, d) => events.push(Object.assign({ type, t: now() }, d));
+  const throttle = (fn, ms) => { let l = 0; return e => { const n = performance.now(); if (n - l >= ms) { l = n; fn(e); } }; };
+  const describe = el => ({ tag: el.tagName, id: el.id || null,
+                            cls: (el.getAttribute && el.getAttribute("class")) || null });
+  const box = el => { const r = el.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map(Math.round); };
+
+  function flush(final) {
+    const chunk = events.slice(sent); sent = events.length;
+    if (!final && !chunk.length) return;
+    const p = { type: "tracking", seq: seq++, final: !!final, events: chunk };
+    if (final) p.summary = {
+      startedAt, endedAt: Date.now(), durationMs: now(),
+      activeMs: now() - hiddenMs - (hiddenSince !== null ? now() - hiddenSince : 0),
+      viewport: [innerWidth, innerHeight] };
+    window.parent.postMessage(p, window.location.origin);
+  }
+  window.Tracker = { flush };
+
+  rec("load", { viewport: [innerWidth, innerHeight] });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) hiddenSince = now();
+    else if (hiddenSince !== null) { hiddenMs += now() - hiddenSince; hiddenSince = null; }
+    rec("visibility", { state: document.visibilityState });
+  });
+  addEventListener("resize", throttle(() => rec("resize", { w: innerWidth, h: innerHeight }), 200));
+
+  function pos(e) {
+    const cell = document.querySelector(".cell");
+    if (!cell) return {};
+    const r = cell.getBoundingClientRect();
+    const out = { x: e.clientX, y: e.clientY, cellRect: box(cell),
+                  px: +((e.clientX - r.left) / r.width).toFixed(4),
+                  py: +((e.clientY - r.top) / r.height).toFixed(4) };
+    const inner = e.target.closest && e.target.closest("svg, canvas");
+    if (inner && cell.contains(inner)) out.innerRect = box(inner);
+    return out;
+  }
+
+  document.addEventListener("mousedown", e => {
+    downInCell = !!(e.target.closest && e.target.closest(".cell"));
+    rec("down", Object.assign({ button: e.button, inCell: downInCell }, pos(e), describe(e.target)));
+  }, true);
+  document.addEventListener("mouseup", e => {
+    rec("up", Object.assign({ button: e.button, startedInCell: downInCell }, pos(e), describe(e.target)));
+    downInCell = false;
+  }, true);
+
+  setInterval(() => flush(false), 15000);
+  addEventListener("pagehide", () => flush(false));
+})();
+</script>

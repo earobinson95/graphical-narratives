@@ -1,0 +1,80 @@
+<script>
+(function () {
+  const SECTION_SELECTOR = ".narrative-col";
+
+  const events = [];
+  let sent = 0, seq = 0, hiddenMs = 0, hiddenSince = null, maxDepth = 0;
+  const t0 = performance.now(), startedAt = Date.now();
+  const now = () => Math.round(performance.now() - t0);
+  const rec = (type, d) => events.push(Object.assign({ type, t: now() }, d));
+  const throttle = (fn, ms) => { let l = 0; return e => { const n = performance.now(); if (n - l >= ms) { l = n; fn(e); } }; };
+
+  function flush(final) {
+    const chunk = events.slice(sent); sent = events.length;
+    if (!final && !chunk.length) return;
+    const p = { type: "tracking", seq: seq++, final: !!final, events: chunk };
+    if (final) p.summary = {
+      startedAt, endedAt: Date.now(), durationMs: now(),
+      activeMs: now() - hiddenMs - (hiddenSince !== null ? now() - hiddenSince : 0),
+      maxScrollDepth: maxDepth, viewport: [innerWidth, innerHeight] };
+    window.parent.postMessage(p, window.location.origin);
+  }
+  window.Tracker = { flush };
+
+  rec("load", { viewport: [innerWidth, innerHeight] });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) hiddenSince = now();
+    else if (hiddenSince !== null) { hiddenMs += now() - hiddenSince; hiddenSince = null; }
+    rec("visibility", { state: document.visibilityState });
+  });
+  addEventListener("resize", throttle(() => rec("resize", { w: innerWidth, h: innerHeight }), 200));
+
+  document.addEventListener("scroll", throttle(e => {
+    const el = (e.target === document) ? document.documentElement : e.target;
+    const max = el.scrollHeight - el.clientHeight;
+    const depth = max > 0 ? el.scrollTop / max : 0;
+    if (el === document.documentElement) maxDepth = Math.max(maxDepth, depth);
+    rec("scroll", { y: Math.round(el.scrollTop), depth: +depth.toFixed(3),
+                    scroller: el === document.documentElement ? "window" : (el.id || el.className || el.tagName) });
+  }, 100), { passive: true, capture: true });
+
+  function setupSections() {
+    const els = [...document.querySelectorAll(SECTION_SELECTOR)];
+    const labelOf = el => el.id || ("narrative_" + els.indexOf(el));
+    const visibleSince = new Map();
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        const id = labelOf(en.target);
+        if (en.isIntersecting) {
+          if (!visibleSince.has(en.target)) {
+            visibleSince.set(en.target, now());
+            rec("section_enter", { id });
+          }
+        } else if (visibleSince.has(en.target)) {
+          rec("section_exit", { id, dwellMs: now() - visibleSince.get(en.target) });
+          visibleSince.delete(en.target);
+        }
+      });
+    }, { rootMargin: "-40% 0px -40% 0px", threshold: 0 });
+
+    els.forEach(el => io.observe(el));
+
+    const origFlush = window.Tracker.flush;
+    window.Tracker.flush = function (final) {
+      if (final) {
+        visibleSince.forEach((t, el) =>
+          rec("section_exit", { id: labelOf(el), dwellMs: now() - t, atEnd: true }));
+        visibleSince.clear();
+      }
+      origFlush(final);
+    };
+  }
+  if (document.readyState === "complete") setupSections();
+  else addEventListener("load", setupSections);
+
+  setInterval(() => flush(false), 15000);
+  addEventListener("pagehide", () => flush(false));
+})();
+</script>

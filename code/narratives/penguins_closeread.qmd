@@ -1,15 +1,17 @@
 ---
 title: "penguins closeread prototype"
-format: 
+format:
   closeread-html:
     css: styles.css
+    embed-resources: true
+    include-after-body: tracker_closeread.html
     cr-style:
       narrative-background-color-overlay: "#DCDCD8"
       narrative-background-color-sidebar: "#F3F4F6"
 bibliography: references.bib
-embed-resources: true
-messages: false
-warning: false
+execute:
+  message: false
+  warning: false
 ---
 
 ```{r}
@@ -681,4 +683,3 @@ geom_point(data = \(d) dplyr::filter(d, species == "Gentoo"),
 So, bill length and depth separate all three species: Chinstraps have long, deep bills, Adélies have short, deep bills, and Gentoo have long, shallow bills. Body size distinguishes Gentoos, and bill shape can distinguish the rest. @cr-bill
 
 :::::::::::
-
