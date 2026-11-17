@@ -19,9 +19,10 @@
       maxScrollDepth: maxDepth, viewport: [innerWidth, innerHeight] };
     window.parent.postMessage(p, window.location.origin);
   }
-  window.Tracker = { flush };
+  window.Tracker = { flush, setSection: s => { section = s; } };
 
-  rec("load", { viewport: [innerWidth, innerHeight] });
+  let section = "explore";
+  const rec = (type, d) => events.push(Object.assign({ type, t: now(), section }, d));
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) hiddenSince = now();
