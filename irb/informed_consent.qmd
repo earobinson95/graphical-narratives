@@ -1,0 +1,49 @@
+---
+title: "Informed Consent: Perception and Decision-Making Using Statistical Graphs"
+subtitle: "IRB Project ID #: 2024-222"
+title-block-banner: "#154734"
+title-block-banner-color: "#E4E3D3"
+format: html
+css: styles.css
+---
+
+![](CP-logo.jpg){width=3in}
+  
+## Introduction
+
+This form asks for your agreement to participate in a research project on graphical perception and decision-making. If you are 18 years of age or older, you are eligible to participate.
+
+## Purpose of the Study and Proposed Benefits
+
+The purpose of this study is to investigate how people perceive and interpret statistical graphs to improve their design. Potential benefits include advancements in data visualization research, although there are no direct benefits to participants.
+        
+## Your Participation
+
+Participation in this study should require less than 20 minutes of your time. You will be asked to look at statistical charts and then answer questions or complete tasks based on the visualization and contextual information.
+
+You may be asked to estimate, predict, or make decisions based on one or more graphs. You will be able to provide an explanation of your response, if you choose to do so. 
+
+We expect that each of these tasks will take less than 3 minutes to complete. At the end of the study, you will be asked for some demographic information, such as your age, education level, and occupation.
+
+We will pay you \$4 (equivalent of \$12/hr) for participating in this study through Prolific. At the conclusion of this study, you will be provided a URL that will direct you back to Prolific, signaling study completion. While you are free to quit at any time or to decline to answer any question, you will only be compensated if you complete the study and click on the redirect URL provided at the end of the study. In order to document your receipt of the payment, you must provide your name and address through Prolific. Payment records will be stored for up to 7 years and may be stored with Financial Personnel at the University.
+        
+## Protections and Potential Risks
+
+Please be aware that you are not required to participate in this research, refusal to participate will not involve any penalty or loss of benefits to which you are otherwise entitled, and you may discontinue your participation at any time. If you decide to withdraw your participation before completing each survey question, you will not be compensated for your time.
+
+There are minimal risks anticipated with your participation in this study.
+
+Your confidentiality will be protected by anonymizing your responses. Data will be securely stored, and identifiable information will not be linked to your responses.
+        
+## Resources and Contact Information
+
+This research is being conducted by Dr. Emily Robinson in the Department of Statistics at Cal Poly, San Luis Obispo. If you have questions regarding this study or would like to be informed of the results when the study is completed, please contact the researcher at erobin17@calpoly.edu. 
+        
+If you have concerns regarding the manner in which the study is conducted, you may contact:
+
++ Dr. Jay Bettergarcia, Chair of the Cal Poly Institutional Review Board, at (805) 756-6178, jbetterg@calpoly.edu
++ Ms. Trish Brock, Director of Research Compliance, at (805) 756-1450, pbrock@calpoly.edu
+        
+## Agreement to Participate
+
+If you are 18 or older and agree to voluntarily participate in this research project as described, please indicate your agreement by clicking 'I have read the informed consent document and agree' to begin the study. Please retain a copy of this form for your reference, and thank you for your participation in this research.
