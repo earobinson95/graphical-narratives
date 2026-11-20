@@ -28,13 +28,17 @@ int_answers <- function(input, ids) {
 
 nfc_items   <- paste0("nfc_", 1:6)
 comp_items  <- paste0("comp_", 1:3)
-trust_items <- c(paste0("tr_", 1:5), paste0("gtd_", 1:4))
+trust_items <- paste0("tr_", 1:5)
+gtd_items <- paste0("gtd_", 1:4)
 
 # ------ #
 # Server #
 # ------ #
 
 function(input, output, session) {
+  
+  shinyjs::disable(selector = ".navbar-nav a")
+  shinyjs::disable(selector = "#study_subtabs a")
   
   condition <- reactiveVal(NULL)
   
@@ -67,7 +71,7 @@ function(input, output, session) {
   # ------------ #
   
   observeEvent(input$submit_demo, {
-    required <- c("prolific_id", "age", "gender", "education", nfc_items)
+    required <- c("prolific_id", "age", "gender", "education", nfc_items, gtd_items)
     
     unanswered <- !vapply(
       required,
@@ -91,6 +95,7 @@ function(input, output, session) {
       gender      = input$gender,
       education   = input$education,
       int_answers(input, nfc_items),
+      int_answers(input, gtd_items),
       submitted_at = as.character(Sys.time()),
       stringsAsFactors = FALSE
     )
@@ -254,22 +259,20 @@ function(input, output, session) {
     saved_notes()
   })
   
-  # ---- Explore ----
+  # Explore
   
   observeEvent(input$next_notes, {
     saved_notes(input$participant_notes)
     notes_submitted(TRUE)
-    
     updateTabsetPanel(session, "study_subtabs", selected = "takeaways-tab")
   })
   
-  # ---- Takeaways ----
+  # Takeaways
   
   takeaway_ids <- c("takeaway1", "takeaway2", "takeaway3")
   
   observe({
     req(input$study_subtabs == "takeaways-tab")
-    
     shinyjs::toggleState("next_takeaways", all_answered(input, takeaway_ids))
   })
   
@@ -293,7 +296,7 @@ function(input, output, session) {
     updateTabsetPanel(session, "study_subtabs", selected = "comprehension-tab")
   })
   
-  # ---- Comprehension ----
+  # Comprehension
   
   observe({
     req(input$study_subtabs == "comprehension-tab")
@@ -324,11 +327,10 @@ function(input, output, session) {
     updateTabsetPanel(session, "study_subtabs", selected = "trust-tab")
   })
   
-  # ---- Trust ----
+  # Trust
   
   observe({
     req(input$study_subtabs == "trust-tab")
-    
     shinyjs::toggleState("finish_exp", all_answered(input, trust_items))
   })
   
