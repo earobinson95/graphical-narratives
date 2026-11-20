@@ -31,14 +31,72 @@ comp_items  <- paste0("comp_", 1:3)
 trust_items <- paste0("tr_", 1:5)
 gtd_items <- paste0("gtd_", 1:4)
 
+nav_lock_js <- '
+(function () {
+  if (window.navLocked) return;
+  window.navLocked = true;
+
+  var navLinks = "#inNavBar a, .navbar-nav a, #study_subtabs a";
+  var navKeys = ["Enter", " ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+
+  var style = document.createElement("style");
+  style.textContent = navLinks + " { pointer-events: none !important; cursor: default; opacity: 1; }";
+  document.head.appendChild(style);
+
+  function blockIfNav(e) {
+    if (e.target && e.target.closest && e.target.closest(navLinks)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }
+
+  document.addEventListener("click", blockIfNav, true);
+  document.addEventListener("keydown", function (e) {
+    if (navKeys.indexOf(e.key) !== -1) blockIfNav(e);
+  }, true);
+})();
+'
+
 # ------ #
 # Server #
 # ------ #
 
 function(input, output, session) {
   
-  shinyjs::disable(selector = ".navbar-nav a")
-  shinyjs::disable(selector = "#study_subtabs a")
+  main_tab <- reactiveVal(NULL) 
+  sub_tab  <- reactiveVal(NULL) 
+  
+  go_main <- function(tab) {
+    main_tab(tab)
+    updateTabsetPanel(session, "inNavBar", selected = tab)
+  }
+  
+  go_sub <- function(tab) {
+    sub_tab(tab)
+    updateTabsetPanel(session, "study_subtabs", selected = tab)
+  }
+  
+  shinyjs::runjs(nav_lock_js)
+  
+  observeEvent(input$inNavBar, {
+    if (is.null(main_tab())) {
+      main_tab(input$inNavBar)
+    } else if (!identical(input$inNavBar, main_tab())) {
+      updateTabsetPanel(session, "inNavBar", selected = main_tab())
+    }
+  })
+  
+  observeEvent(input$study_subtabs, {
+    if (is.null(sub_tab())) {
+      sub_tab(input$study_subtabs)
+    } else if (!identical(input$study_subtabs, sub_tab())) {
+      updateTabsetPanel(session, "study_subtabs", selected = sub_tab())
+    }
+  })
+  
+  # ----- #
+  # State #
+  # ----- #
   
   condition <- reactiveVal(NULL)
   
@@ -60,7 +118,7 @@ function(input, output, session) {
         condition(sample(c("author_driven", "reader_driven"), 1))
       }
       
-      updateTabsetPanel(session, "inNavBar", selected = "demographics-tab")
+      go_main("demographics-tab")
     } else {
       showNotification("Please provide informed consent.", type = "warning")
     }
@@ -108,8 +166,8 @@ function(input, output, session) {
       row.names = FALSE
     )
     
-    updateTabsetPanel(session, "inNavBar", selected = "study-tab")
-    updateTabsetPanel(session, "study_subtabs", selected = "explore-tab")
+    go_main("study-tab")
+    go_sub("explore-tab")
   })
   
   # --------- #
@@ -133,9 +191,11 @@ function(input, output, session) {
   })
   
   # Tell the iframe which section the participant is in, so every
-  # tracked event is tagged with it (explore / takeaways / comprehension)
-  observeEvent(input$study_subtabs, {
-    section <- sub("-tab$", "", input$study_subtabs)
+  # tracked event is tagged with it (explore / takeaways / comprehension).
+  # Driven by the server's tab (sub_tab), not the raw browser input, so a
+  # blocked or reverted click can never mislabel tracked events.
+  observeEvent(sub_tab(), {
+    section <- sub("-tab$", "", sub_tab())
     
     shinyjs::runjs(sprintf("
       var f = document.getElementById('study_iframe');
@@ -152,7 +212,7 @@ function(input, output, session) {
   # ----- #
   
   output$tasks <- renderUI({
-    current_tab <- input$study_subtabs
+    current_tab <- sub_tab()
     
     req(current_tab)
     
@@ -264,7 +324,7 @@ function(input, output, session) {
   observeEvent(input$next_notes, {
     saved_notes(input$participant_notes)
     notes_submitted(TRUE)
-    updateTabsetPanel(session, "study_subtabs", selected = "takeaways-tab")
+    go_sub("takeaways-tab")
   })
   
   # Takeaways
@@ -272,7 +332,7 @@ function(input, output, session) {
   takeaway_ids <- c("takeaway1", "takeaway2", "takeaway3")
   
   observe({
-    req(input$study_subtabs == "takeaways-tab")
+    req(sub_tab() == "takeaways-tab")
     shinyjs::toggleState("next_takeaways", all_answered(input, takeaway_ids))
   })
   
@@ -293,13 +353,13 @@ function(input, output, session) {
     ))
     takeaways_submitted(TRUE)
     
-    updateTabsetPanel(session, "study_subtabs", selected = "comprehension-tab")
+    go_sub("comprehension-tab")
   })
   
   # Comprehension
   
   observe({
-    req(input$study_subtabs == "comprehension-tab")
+    req(sub_tab() == "comprehension-tab")
     
     shinyjs::toggleState("next_comprehension", all_answered(input, comp_items))
   })
@@ -324,13 +384,13 @@ function(input, output, session) {
     ))
     comprehension_submitted(TRUE)
     
-    updateTabsetPanel(session, "study_subtabs", selected = "trust-tab")
+    go_sub("trust-tab")
   })
   
   # Trust
   
   observe({
-    req(input$study_subtabs == "trust-tab")
+    req(sub_tab() == "trust-tab")
     shinyjs::toggleState("finish_exp", all_answered(input, trust_items))
   })
   
@@ -401,7 +461,8 @@ function(input, output, session) {
         f.contentWindow.Tracker.flush(true);
       }
     ")
-  })  
+  })
+  
   # -------- #
   # Tracking #
   # -------- #
@@ -412,7 +473,7 @@ function(input, output, session) {
       type = "warning"
     )
     
-    updateTabsetPanel(session, "inNavBar", selected = "done-tab")
+    go_main("done-tab")
   })
   
   observeEvent(input$tracking, {
@@ -435,7 +496,6 @@ function(input, output, session) {
       )
     }
     
-    # pull element i of an array field, e.g. cellRect = [left, top, w, h]
     box <- function(l, k, i) {
       vapply(
         l,
@@ -450,7 +510,7 @@ function(input, output, session) {
       )
     }
     
-    # ---- scrolling ----
+    # scrolling
     
     scroll <- Filter(
       function(e) e$type %in% c("scroll", "section_enter", "section_exit"),
@@ -483,7 +543,7 @@ function(input, output, session) {
       )
     }
     
-    # ---- clicks ----
+    # clicks
     
     clicks <- Filter(
       function(e) e$type %in% c("down", "up"),
@@ -537,7 +597,7 @@ function(input, output, session) {
     }
     
     if (isTRUE(msg$final)) {
-      updateTabsetPanel(session, "inNavBar", selected = "done-tab")
+      go_main("done-tab")
     }
   })
 }

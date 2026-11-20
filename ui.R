@@ -17,7 +17,14 @@ likert_matrix <- function(questions, labels, title = NULL) {
   n <- length(labels)
   
   tagList(
-    if (!is.null(title)) h4(title),
+    if (!is.null(title)) {
+      tags$label(
+        class = "control-label",
+        title
+      )
+    },
+    
+    p("For each statement below, please select the response that best reflects your level of agreement."),
     
     tags$div(
       class = "likert-scroll",
@@ -207,6 +214,8 @@ navbarPage(
     
     textInput("prolific_id", "Prolific ID"),
     
+    tags$br(),
+    
     selectizeInput(
       "age",
       "Age Range",
@@ -214,6 +223,8 @@ navbarPage(
                    "36-40", "41-45", "46-50", "51-55", "56-60", 
                    "Over 60", "Prefer not to answer")
     ),
+    
+    tags$br(),
     
     radioButtons(
       "gender",
@@ -223,6 +234,8 @@ navbarPage(
       ),
       selected = character(0)
     ),
+    
+    tags$br(),
     
     selectizeInput(
       "education",
@@ -234,6 +247,8 @@ navbarPage(
                   "Some Graduate Courses",
                   "Graduate Degree",
                   "Prefer not to answer")),
+    
+    tags$br(),
     
     likert_matrix(
       title = "Need for Cognition",
@@ -247,6 +262,8 @@ navbarPage(
       ),
       labels = labels_5
     ),
+    
+    tags$br(),
     
     likert_matrix(
       title = "General Trust Disposition",
@@ -280,6 +297,8 @@ navbarPage(
       tabPanel(
         "Trust",
         value = "trust-tab",
+        
+        tags$br(),
         
         likert_matrix(
           title = "Trust",
